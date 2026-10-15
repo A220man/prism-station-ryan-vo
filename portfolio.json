@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "name": "prism-station-ryan-vo",
+  "owner": "A220man",
+  "email": "ryandtvo@gmail.com",
+  "domain": "AI/ML developer tools",
+  "summary": "Work in progress: prism-station-ryan-vo",
+  "workflows": [
+    "Create and manage AI agent skills with version control and platform targeting",
+    "Validate skill structure and cross-platform compatibility with automated checks",
+    "Search, filter, and export skills in multiple formats for sharing and backup"
+  ],
+  "auth": "oidc-keycloak-saml-broker",
+  "llm_providers": [
+    "openai-compatible",
+    "anthropic",
+    "gemini",
+    "ollama"
+  ],
+  "status": "work-in-progress"
+}
