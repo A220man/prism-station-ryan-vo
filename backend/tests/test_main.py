@@ -363,3 +363,68 @@ class TestSkillEndpoints:
         data = response.json()
         assert len(data) == 1
         assert data[0]["name"] == "SwiftUI Skill"
+    def test_validate_skill_missing_sections(self, auth_headers):
+        response = client.post(
+            "/api/skills/validate",
+            json={"content": "name: Test\nversion: 1.0.0", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["valid"] is False
+        assert any(e["type"] == "missing_section" and "SKILL.md" in e["message"] for e in data["errors"])
+
+    def test_validate_skill_invalid_version(self, auth_headers):
+        response = client.post(
+            "/api/skills/validate",
+            json={"content": "# SKILL.md\nname: Test\nversion: not-valid", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["valid"] is False
+        assert any(e["type"] == "invalid_version" for e in data["errors"])
+
+    def test_validate_skill_invalid_platform(self, auth_headers):
+        response = client.post(
+            "/api/skills/validate",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0", "platform_targets": ["android"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["valid"] is False
+        assert any(e["type"] == "invalid_platform" for e in data["errors"])
+
+    def test_validate_skill_deprecated_api(self, auth_headers):
+        response = client.post(
+            "/api/skills/validate",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0\nUIApplication.shared", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["valid"] is False
+        assert any(e["type"] == "deprecated_api" for e in data["errors"])
+
+    def test_validate_skill_unnecessary_available_check(self, auth_headers):
+        response = client.post(
+            "/api/skills/validate",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0\nif #available(iOS 26.0, *) {}", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["valid"] is False
+        assert any(e["type"] == "unnecessary_available_check" for e in data["errors"])
+
+    def test_validate_skill_valid_available_check(self, auth_headers):
+        response = client.post(
+            "/api/skills/validate",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0\nif #available(iOS 15.0, *) {}", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        # Should be valid - iOS 15.0 is below minimum target of 26.0
+        assert data["valid"] is True

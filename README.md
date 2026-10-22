@@ -1,4 +1,4 @@
-# Prism Station - AI Agent Skill Management Platform
+# Prism Station - AI Agent Skill Management Platform — Ryan Vo
 
 > Work in progress. This checkpoint may be incomplete or fail tests. See PLAN.md and STATUS.md before use.
 
