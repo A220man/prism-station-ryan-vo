@@ -1,1 +1,125 @@
-{"schema_version":1,"current_feature":"skill-crud","features":[{"id":"core-skeleton","title":"FastAPI/React skeleton with auth, DB, and CI","status":"done","acceptance":["FastAPI app starts and serves health endpoint","React app builds and serves frontend","SQLite database with migrations","OIDC/Keycloak auth configuration","Docker Compose with backend, frontend, Keycloak","CI workflow runs backend and frontend tests"],"implementation":["backend/app/main.py","backend/app/api/health.py","backend/app/api/auth.py","backend/app/api/skills.py","backend/app/core/config.py","backend/app/core/database.py","backend/app/core/security.py","backend/app/models/skill.py","backend/app/services/skill_service.py","backend/requirements.txt","backend/Dockerfile","backend/tests/test_main.py","frontend/package.json","frontend/vite.config.ts","frontend/tsconfig.json","frontend/index.html","frontend/src/main.tsx","frontend/src/App.tsx","frontend/src/api/client.ts","frontend/src/components/Layout.tsx","frontend/src/pages/Health.tsx","frontend/src/pages/SkillsList.tsx","frontend/src/pages/SkillDetail.tsx","frontend/src/pages/SkillForm.tsx","frontend/src/pages/Login.tsx","frontend/src/pages/Register.tsx","frontend/src/index.css","frontend/Dockerfile","frontend/nginx.conf","compose.yaml",".github/workflows/ci.yml","portfolio.json","README.md","LICENSE","CHANGELOG.md","pyproject.toml",".gitignore",".env.example"],"tests":["backend/tests/test_main.py","frontend/src/test/health.test.tsx"]},{"id":"skill-crud","title":"Skill CRUD API and UI","status":"in_progress","acceptance":["Create, read, update, delete skills via API","Skill model with name, description, version, content, platform targets","React forms for skill management","Pagination and filtering"],"implementation":[],"tests":[]},{"id":"skill-validation","title":"Skill validation engine","status":"planned","acceptance":["Validate skill structure (required fields, version format)","Check for duplicate skills","Validate platform-specific references","Report validation errors with line numbers"],"implementation":[],"tests":[]},{"id":"skill-search","title":"Skill search and discovery","status":"planned","acceptance":["Full-text search across skill content","Filter by platform (iOS, macOS, visionOS, watchOS, tvOS)","Filter by skill category/tags","Export skills as markdown/JSON"],"implementation":[],"tests":[]},{"id":"llm-integration","title":"LLM-powered skill analysis","status":"planned","acceptance":["Analyze skill for best practices (optional, advisory)","Suggest improvements for cross-platform compatibility","Detect deprecated API usage","Provider-agnostic LLM adapter (OpenAI-compatible, Anthropic, Gemini, Ollama)"],"implementation":[],"tests":[]}]}
+{
+    "schema_version": 1,
+    "current_feature": "skill-crud",
+    "features": [
+        {
+            "id": "core-skeleton",
+            "title": "FastAPI/React skeleton with auth, DB, and CI",
+            "status": "done",
+            "acceptance": [
+                "FastAPI app starts and serves health endpoint",
+                "React app builds and serves frontend",
+                "SQLite database with migrations",
+                "OIDC/Keycloak auth configuration",
+                "Docker Compose with backend, frontend, Keycloak",
+                "CI workflow runs backend and frontend tests"
+            ],
+            "implementation": [
+                "backend/app/main.py",
+                "backend/app/api/health.py",
+                "backend/app/api/auth.py",
+                "backend/app/api/skills.py",
+                "backend/app/core/config.py",
+                "backend/app/core/database.py",
+                "backend/app/core/security.py",
+                "backend/app/models/skill.py",
+                "backend/app/services/skill_service.py",
+                "backend/requirements.txt",
+                "backend/Dockerfile",
+                "backend/tests/test_main.py",
+                "frontend/package.json",
+                "frontend/vite.config.ts",
+                "frontend/tsconfig.json",
+                "frontend/index.html",
+                "frontend/src/main.tsx",
+                "frontend/src/App.tsx",
+                "frontend/src/api/client.ts",
+                "frontend/src/components/Layout.tsx",
+                "frontend/src/pages/Health.tsx",
+                "frontend/src/pages/SkillsList.tsx",
+                "frontend/src/pages/SkillDetail.tsx",
+                "frontend/src/pages/SkillForm.tsx",
+                "frontend/src/pages/Login.tsx",
+                "frontend/src/pages/Register.tsx",
+                "frontend/src/index.css",
+                "frontend/Dockerfile",
+                "frontend/nginx.conf",
+                "compose.yaml",
+                ".github/workflows/ci.yml",
+                "portfolio.json",
+                "README.md",
+                "LICENSE",
+                "CHANGELOG.md",
+                "pyproject.toml",
+                ".gitignore",
+                ".env.example"
+            ],
+            "tests": [
+                "backend/tests/test_main.py",
+                "frontend/src/test/health.test.tsx"
+            ]
+        },
+        {
+            "id": "skill-crud",
+            "title": "Skill CRUD API and UI",
+            "status": "in_progress",
+            "acceptance": [
+                "Create, read, update, delete skills via API",
+                "Skill model with name, description, version, content, platform targets",
+                "React forms for skill management",
+                "Pagination and filtering"
+            ],
+            "implementation": [],
+            "tests": []
+        },
+        {
+            "id": "skill-validation",
+            "title": "Skill validation engine",
+            "status": "done",
+            "acceptance": [
+                "Validate skill structure (required fields, version format)",
+                "Check for duplicate skills",
+                "Validate platform-specific references",
+                "Report validation errors with line numbers"
+            ],
+            "implementation": [
+                "backend/app/services/skill_service.py",
+                "backend/tests/test_main.py"
+            ],
+            "tests": [
+                "backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_missing_sections",
+                "backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_invalid_version",
+                "backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_invalid_platform",
+                "backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_deprecated_api",
+                "backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_unnecessary_available_check",
+                "backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_valid_available_check"
+            ]
+        },
+        {
+            "id": "skill-search",
+            "title": "Skill search and discovery",
+            "status": "planned",
+            "acceptance": [
+                "Full-text search across skill content",
+                "Filter by platform (iOS, macOS, visionOS, watchOS, tvOS)",
+                "Filter by skill category/tags",
+                "Export skills as markdown/JSON"
+            ],
+            "implementation": [],
+            "tests": []
+        },
+        {
+            "id": "llm-integration",
+            "title": "LLM-powered skill analysis",
+            "status": "planned",
+            "acceptance": [
+                "Analyze skill for best practices (optional, advisory)",
+                "Suggest improvements for cross-platform compatibility",
+                "Detect deprecated API usage",
+                "Provider-agnostic LLM adapter (OpenAI-compatible, Anthropic, Gemini, Ollama)"
+            ],
+            "implementation": [],
+            "tests": []
+        }
+    ]
+}

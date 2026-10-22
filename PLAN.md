@@ -36,13 +36,17 @@ Acceptance:
 
 ### skill-validation — Skill validation engine
 
-Status: planned
+Status: done
 
 Acceptance:
 - Validate skill structure (required fields, version format)
 - Check for duplicate skills
 - Validate platform-specific references
 - Report validation errors with line numbers
+
+Implementation: `backend/app/services/skill_service.py`, `backend/tests/test_main.py`
+
+Tests: `backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_missing_sections`, `backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_invalid_version`, `backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_invalid_platform`, `backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_deprecated_api`, `backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_unnecessary_available_check`, `backend/tests/test_main.py::TestSkillEndpoints::test_validate_skill_valid_available_check`
 
 ### skill-search — Skill search and discovery
 

@@ -138,21 +138,112 @@ class SkillService:
         errors = []
         lines = content.split("\n")
 
-        required_sections = ["SKILL.md", "version:", "name:"]
-        for section in required_sections:
-            if not any(section in line for line in lines):
-                errors.append({"type": "missing_section", "message": f"Missing required section: {section}"})
+        # Check required sections with line numbers
+        required_sections = {
+            "SKILL.md": "Missing required section: SKILL.md (skill definition header)",
+            "version:": "Missing required field: version (semver format required)",
+            "name:": "Missing required field: name (skill identifier)",
+        }
+        for section, message in required_sections.items():
+            found = False
+            for i, line in enumerate(lines, 1):
+                if section in line:
+                    found = True
+                    break
+            if not found:
+                errors.append({"type": "missing_section", "message": message, "line": None})
 
+        # Validate version format if present
+        for i, line in enumerate(lines, 1):
+            if "version:" in line:
+                # Extract version value after "version:"
+                parts = line.split("version:", 1)
+                if len(parts) > 1:
+                    version_str = parts[1].strip()
+                    # Remove quotes if present
+                    version_str = version_str.strip('"\'')
+                    if not self._is_valid_semver(version_str):
+                        errors.append({
+                            "type": "invalid_version",
+                            "message": f"Invalid version format: '{version_str}'. Expected semver (e.g., 1.0.0)",
+                            "line": i
+                        })
+                break
+
+        # Validate platform targets
         valid_platforms = {"iOS", "macOS", "visionOS", "watchOS", "tvOS", "linux", "windows"}
         for platform in platform_targets:
             if platform not in valid_platforms:
-                errors.append({"type": "invalid_platform", "message": f"Unknown platform target: {platform}"})
+                errors.append({
+                    "type": "invalid_platform",
+                    "message": f"Unknown platform target: '{platform}'. Valid: {', '.join(sorted(valid_platforms))}",
+                    "line": None
+                })
 
-        for i, line in enumerate(lines, 1):
-            if "iOS 26" in line and "iOS 26" not in line:
-                pass
+        # Check for deprecated API usage and platform-specific issues
+        self._check_deprecated_apis(lines, errors)
+        self._check_platform_availability(lines, platform_targets, errors)
 
         return errors
+
+    def _is_valid_semver(self, version: str) -> bool:
+        import re
+        return bool(re.match(r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$", version))
+
+    def _check_deprecated_apis(self, lines: List[str], errors: List[dict]) -> None:
+        """Check for known deprecated Swift/SwiftUI APIs."""
+        deprecated_patterns = [
+            (r"\.onAppear\s*\(", "Consider using .task instead of .onAppear for async work"),
+            (r"UIApplication\.shared", "UIApplication.shared is deprecated; use UIApplication.shared.connectedScenes"),
+            (r"UIScreen\.main", "UIScreen.main is deprecated; use windowScene.screen"),
+            (r"@UIApplicationMain", "@UIApplicationMain is deprecated; use @main"),
+        ]
+        for i, line in enumerate(lines, 1):
+            for pattern, message in deprecated_patterns:
+                import re
+                if re.search(pattern, line):
+                    errors.append({
+                        "type": "deprecated_api",
+                        "message": message,
+                        "line": i
+                    })
+
+    def _check_platform_availability(self, lines: List[str], platform_targets: List[str], errors: List[dict]) -> None:
+        """Check #available conditions against minimum deployment targets."""
+        if not platform_targets:
+            return
+
+        # Minimum version map for platforms
+        min_versions = {
+            "iOS": (26, 0),
+            "macOS": (15, 0),
+            "visionOS": (2, 0),
+            "watchOS": (11, 0),
+            "tvOS": (18, 0),
+        }
+
+        import re
+        for i, line in enumerate(lines, 1):
+            # Check #available conditions
+            available_match = re.search(r'#available\s*\(([^)]+)\)', line)
+            if available_match:
+                conditions = available_match.group(1)
+                for platform, min_ver in min_versions.items():
+                    if platform in platform_targets:
+                        # Check if platform appears in #available with version >= minimum
+                        platform_pattern = rf'{platform}\s+(\d+(?:\.\d+)*)'
+                        match = re.search(platform_pattern, conditions)
+                        if match:
+                            try:
+                                ver_parts = tuple(map(int, match.group(1).split('.')))
+                                if ver_parts >= min_ver:
+                                    errors.append({
+                                        "type": "unnecessary_available_check",
+                                        "message": f"#available check for {platform} {match.group(1)} is unnecessary (minimum target is {min_ver[0]}.{min_ver[1]})",
+                                        "line": i
+                                    })
+                            except ValueError:
+                                pass
 
     def search_skills(self, query: str, limit: int = 10) -> List[Skill]:
         search_term = f"%{query}%"

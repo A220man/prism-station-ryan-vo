@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.0.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
@@ -16,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FastAPI backend with SQLite persistence
 - React + TypeScript + Vite frontend
 - Skill CRUD API with full metadata (name, slug, version, content, platform targets, tags)
-- Skill validation engine (required sections, version format, platform targets)
+- Skill validation engine (required sections, version format, platform targets, deprecated API detection, #available checks against minimum deployment targets)
 - Skill search and filtering (full-text, platform, tags)
 - Skill export (Markdown and JSON)
 - JWT-based authentication with registration/login
