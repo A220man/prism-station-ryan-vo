@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/skills", tags=["skills"])
 
 class SkillCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    slug: str = Field(..., min_length=1, max_length=255, pattern="^[a-z0-9-]+$")
+    slug: Optional[str] = Field(None, min_length=1, max_length=255, pattern="^[a-z0-9-]+$")
     description: Optional[str] = None
     version: str = Field(default="1.0.0", pattern=r"^\d+\.\d+\.\d+$")
     content: str = Field(..., min_length=1)
@@ -23,7 +23,8 @@ class SkillCreate(BaseModel):
 
     @validator("slug")
     def slug_lowercase(cls, v):
-        return v.lower()
+        return v.lower() if v else v
+
 
 
 class SkillUpdate(BaseModel):
@@ -81,13 +82,13 @@ async def create_skill(
     service = SkillService(db)
     skill = service.create_skill(
         name=skill_data.name,
-        slug=skill_data.slug,
         content=skill_data.content,
         author_id=int(current_user.sub),
         description=skill_data.description,
         version=skill_data.version,
         platform_targets=skill_data.platform_targets,
         tags=skill_data.tags,
+        slug=skill_data.slug,
     )
     return SkillResponse.from_orm(skill)
 

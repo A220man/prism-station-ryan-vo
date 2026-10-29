@@ -1,6 +1,17 @@
 # Changelog
 
+## 1.2.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
 ## 1.1.0 — work-in-progress checkpoint
+
+### Added
+- Skill CRUD: Auto-generate slug from skill name (optional explicit slug with conflict detection)
+- Skill CRUD: Unique slug enforcement with counter suffix (e.g., `test-skill`, `test-skill-1`)
+
+### Changed
+- SkillCreate API: `slug` field now optional; auto-generated from `name` if not provided
 
 Partial code published for continued development. Known issues: STATUS.md.
 
