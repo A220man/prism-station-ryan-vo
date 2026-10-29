@@ -1,11 +1,20 @@
 from datetime import datetime, timezone
 from typing import Optional, List, Tuple
+import re
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func, select
 from fastapi import HTTPException, status
 
 from app.models.skill import Skill, User, AuditLog
 from app.core.security import get_password_hash
+
+
+def slugify(text: str) -> str:
+    """Convert text to a URL-friendly slug."""
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9\s-]', '', text)
+    text = re.sub(r'[\s-]+', '-', text)
+    return text.strip('-')
 
 
 class SkillService:
@@ -15,17 +24,27 @@ class SkillService:
     def create_skill(
         self,
         name: str,
-        slug: str,
         content: str,
         author_id: int,
         description: Optional[str] = None,
         version: str = "1.0.0",
         platform_targets: Optional[List[str]] = None,
         tags: Optional[List[str]] = None,
+        slug: Optional[str] = None,
     ) -> Skill:
-        existing = self.db.query(Skill).filter(Skill.slug == slug).first()
-        if existing:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Skill slug already exists")
+        # If slug is explicitly provided, check for exact conflict
+        if slug is not None:
+            existing = self.db.query(Skill).filter(Skill.slug == slug).first()
+            if existing:
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Skill slug already exists")
+        else:
+            # Auto-generate slug from name and ensure uniqueness
+            slug = slugify(name)
+            original_slug = slug
+            counter = 1
+            while self.db.query(Skill).filter(Skill.slug == slug).first():
+                slug = f"{original_slug}-{counter}"
+                counter += 1
 
         skill = Skill(
             name=name,
