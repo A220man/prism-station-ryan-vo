@@ -1,6 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { skillsApi, Skill } from '../api/client';
+
+const PLATFORMS = ['iOS', 'macOS', 'visionOS', 'watchOS', 'tvOS', 'linux', 'windows'];
 
 export function SkillsList() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -8,6 +11,8 @@ export function SkillsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [platform, setPlatform] = useState('');
+  const [tag, setTag] = useState('');
   const [page, setPage] = useState(0);
   const limit = 20;
 
@@ -15,7 +20,7 @@ export function SkillsList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await skillsApi.list({ skip: page * limit, limit, search: search || undefined });
+      const response = await skillsApi.list({ skip: page * limit, limit, search: search || undefined, platform: platform || undefined, tag: tag || undefined });
       setSkills(response.data.items);
       setTotal(response.data.total);
     } catch (err) {
@@ -28,10 +33,15 @@ export function SkillsList() {
 
   useEffect(() => {
     fetchSkills();
-  }, [page, search]);
+  }, [page, search, platform, tag]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setPage(0);
+    fetchSkills();
+  };
+
+  const handleFilterChange = () => {
     setPage(0);
     fetchSkills();
   };
@@ -41,8 +51,9 @@ export function SkillsList() {
   if (loading && skills.length === 0) {
     return (
       <div className="card">
-        <div className="card-body">
-          <div className="loading-spinner" />
+        <div className="card-body text-center py-12">
+          <div className="loading-spinner mx-auto"></div>
+          <p className="text-gray-500 mt-4">Loading skills...</p>
         </div>
       </div>
     );
@@ -65,13 +76,30 @@ export function SkillsList() {
 
       <form onSubmit={handleSearch} className="card">
         <div className="card-body">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <input
                 type="text"
                 placeholder="Search skills..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                className="form-input"
+              />
+            </div>
+            <div className="w-full sm:w-48">
+              <select value={platform} onChange={(e) => { setPlatform(e.target.value); handleFilterChange(); }} className="form-input">
+                <option value="">All Platforms</option>
+                {PLATFORMS.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
+            </div>
+            <div className="w-full sm:w-48">
+              <input
+                type="text"
+                placeholder="Filter by tag..."
+                value={tag}
+                onChange={(e) => { setTag(e.target.value); handleFilterChange(); }}
                 className="form-input"
               />
             </div>
