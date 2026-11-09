@@ -4,7 +4,7 @@ Each round completes one feature or repair. Future items are planned, not implem
 
 ## Current round
 
-skill-search
+llm-integration
 
 ## Roadmap
 
@@ -69,11 +69,15 @@ Tests: `backend/tests/test_main.py::TestSkillEndpoints::test_search_skills`
 
 ### llm-integration — LLM-powered skill analysis
 
-Status: planned
+Status: in_progress
 
 Acceptance:
 - Analyze skill for best practices (optional, advisory)
 - Suggest improvements for cross-platform compatibility
 - Detect deprecated API usage
 - Provider-agnostic LLM adapter (OpenAI-compatible, Anthropic, Gemini, Ollama)
+
+Implementation: `backend/app/services/llm_service.py`, `backend/app/api/llm.py`, `backend/app/main.py`
+
+Tests: `backend/tests/test_main.py::TestLLMEndpoints::test_llm_status_unavailable`, `backend/tests/test_main.py::TestLLMEndpoints::test_llm_analyze_unavailable`, `backend/tests/test_main.py::TestLLMEndpoints::test_llm_cross_platform_unavailable`, `backend/tests/test_main.py::TestLLMEndpoints::test_llm_deprecated_apis_unavailable`, `backend/tests/test_main.py::TestLLMEndpoints::test_llm_analyze_unauthorized`
 

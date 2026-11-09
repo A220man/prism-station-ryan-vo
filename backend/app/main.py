@@ -4,8 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.core.database import init_db
-from app.api import health, auth, skills
-
+from app.api import health, auth, skills, llm
 settings = get_settings()
 
 
@@ -31,6 +30,7 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(llm.router)
 app.include_router(auth.router)
 app.include_router(skills.router)
 
