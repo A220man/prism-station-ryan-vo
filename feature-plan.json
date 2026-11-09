@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "skill-search",
+  "current_feature": "llm-integration",
   "features": [
     {
       "id": "core-skeleton",
@@ -133,15 +133,25 @@
     {
       "id": "llm-integration",
       "title": "LLM-powered skill analysis",
-      "status": "planned",
+      "status": "in_progress",
       "acceptance": [
         "Analyze skill for best practices (optional, advisory)",
         "Suggest improvements for cross-platform compatibility",
         "Detect deprecated API usage",
         "Provider-agnostic LLM adapter (OpenAI-compatible, Anthropic, Gemini, Ollama)"
       ],
-      "implementation": [],
-      "tests": []
+      "implementation": [
+        "backend/app/services/llm_service.py",
+        "backend/app/api/llm.py",
+        "backend/app/main.py"
+      ],
+      "tests": [
+        "backend/tests/test_main.py::TestLLMEndpoints::test_llm_status_unavailable",
+        "backend/tests/test_main.py::TestLLMEndpoints::test_llm_analyze_unavailable",
+        "backend/tests/test_main.py::TestLLMEndpoints::test_llm_cross_platform_unavailable",
+        "backend/tests/test_main.py::TestLLMEndpoints::test_llm_deprecated_apis_unavailable",
+        "backend/tests/test_main.py::TestLLMEndpoints::test_llm_analyze_unauthorized"
+      ]
     }
   ]
 }

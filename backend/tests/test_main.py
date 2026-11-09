@@ -428,3 +428,50 @@ class TestSkillEndpoints:
         data = response.json()
         # Should be valid - iOS 15.0 is below minimum target of 26.0
         assert data["valid"] is True
+class TestLLMEndpoints:
+    def test_llm_status_unavailable(self, auth_headers):
+        """Test LLM status when provider not configured."""
+        response = client.get("/api/llm/status", headers=auth_headers)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["available"] is False
+        assert data["provider"] is None
+        assert data["model"] is None
+
+    def test_llm_analyze_unavailable(self, auth_headers):
+        """Test LLM analyze when provider not configured."""
+        response = client.post(
+            "/api/llm/analyze",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 503
+        assert "LLM provider not configured" in response.json()["detail"]
+
+    def test_llm_cross_platform_unavailable(self, auth_headers):
+        """Test LLM cross-platform when provider not configured."""
+        response = client.post(
+            "/api/llm/cross-platform",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 503
+        assert "LLM provider not configured" in response.json()["detail"]
+
+    def test_llm_deprecated_apis_unavailable(self, auth_headers):
+        """Test LLM deprecated API detection when provider not configured."""
+        response = client.post(
+            "/api/llm/deprecated-apis",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0", "platform_targets": ["iOS"]},
+            headers=auth_headers,
+        )
+        assert response.status_code == 503
+        assert "LLM provider not configured" in response.json()["detail"]
+
+    def test_llm_analyze_unauthorized(self):
+        """Test LLM analyze without auth."""
+        response = client.post(
+            "/api/llm/analyze",
+            json={"content": "# SKILL.md\nname: Test\nversion: 1.0.0", "platform_targets": ["iOS"]},
+        )
+        assert response.status_code == 401
