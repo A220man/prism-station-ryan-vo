@@ -210,7 +210,7 @@ def create_llm_provider() -> Optional[LLMProvider]:
         return OpenAICompatibleProvider(base_url, api_key, model)
     elif provider == "anthropic":
         return AnthropicProvider(api_key, model, base_url)
-\n    elif provider == "mock":\
+    elif provider == "mock":
         return MockProvider(api_key, model)
     elif provider == "gemini":
         return GeminiProvider(api_key, model, base_url)
