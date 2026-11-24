@@ -192,6 +192,78 @@ class GeminiProvider(LLMProvider):
         await self.client.aclose()
 
 
+
+class MockProvider(LLMProvider):
+    """Mock LLM provider for testing and development without an actual API key.
+
+    Returns deterministic advisory responses for skill analysis,
+    cross-platform suggestions, and deprecated API detection.
+    """
+
+    def __init__(self, api_key: str, model: str):
+        self.api_key = api_key
+        self.model = model
+
+    async def complete(self, prompt: str, system_prompt: Optional[str] = None) -> LLMResponse:
+        """Return a deterministic mock response for skill analysis."""
+        return LLMResponse(
+            content=self._generate_mock_analysis(system_prompt, prompt),
+            model=self.model,
+            provider=self.get_provider_name(),
+        )
+
+    def get_model_name(self) -> str:
+        return self.model
+
+    def get_provider_name(self) -> str:
+        return "mock"
+
+    async def close(self):
+        pass
+
+    def _generate_mock_analysis(self, system_prompt: Optional[str], prompt: str) -> str:
+        """Generate a deterministic mock analysis based on the prompt content."""
+        analysis_sections = []
+
+        # Look for skill content in the prompt
+        if "Skill content:" in prompt:
+            # Find the skill content between ``` markers
+            marker = "Skill content:\n```"
+            if marker in prompt:
+                after_marker = prompt.split(marker, 1)[1]
+                skill_content = after_marker.split("```")[0].strip() if "```" in after_marker else after_marker.strip()
+            else:
+                skill_content = ""
+
+            if skill_content:
+                content_lower = skill_content.lower()
+                if "swiftui" in content_lower or "ui" in content_lower:
+                    analysis_sections.append("## SwiftUI Best Practices")
+                    analysis_sections.append("- Use `@StateObject` for view model state")
+                    analysis_sections.append("- Prefer `async/await` over completion handlers")
+                    analysis_sections.append("- Consider `Task {}` for async initialization")
+
+                if "deprecated" in content_lower or "old" in content_lower:
+                    analysis_sections.append("## Deprecated API Detection")
+                    analysis_sections.append("- Found references to deprecated APIs (mock detection)")
+                    analysis_sections.append("- Migrate to modern SwiftUI alternatives")
+
+                if "cross-platform" in content_lower or "platform" in content_lower:
+                    analysis_sections.append("## Cross-Platform Compatibility")
+                    analysis_sections.append("- Ensure platform availability checks (@available)")
+                    analysis_sections.append("- Use platform-specific modifiers conditionally")
+
+                if "accessibility" in content_lower or "accessibility" in content_lower.lower():
+                    analysis_sections.append("## Accessibility")
+                    analysis_sections.append("- Add `label` modifiers to interactive elements")
+                    analysis_sections.append("- Ensure sufficient color contrast")
+
+        if not analysis_sections:
+            analysis_sections = ["## Mock Analysis"]
+            analysis_sections.append("*Mock LLM response - configure real provider for actual analysis*")
+
+        return "\n\n".join(analysis_sections)
+
 def create_llm_provider() -> Optional[LLMProvider]:
     """Create LLM provider from settings."""
     settings = get_settings()

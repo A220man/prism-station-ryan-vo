@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.0 — work-in-progress checkpoint
+
+Partial code published for continued development. Known issues: STATUS.md.
+
+## 1.7.1 — work-in-progress checkpoint
+
+### Fixed
+- Added `MockProvider` class to `backend/app/services/llm_service.py` to support `LLM_PROVIDER=mock` configuration
+- Provider-agnostic LLM adapter now supports: OpenAI-compatible, Anthropic, Gemini, Ollama, and mock providers
+- Prevents `NameError` when configuring `LLM_PROVIDER=mock` in environment
+
 ## 1.7.0 — work-in-progress checkpoint
 
 Partial code published for continued development. Known issues: STATUS.md.
